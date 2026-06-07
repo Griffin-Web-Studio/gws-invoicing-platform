@@ -1,3 +1,5 @@
+<img align="right" width="200" src="gws-books.svg" alt="Project Icon">
+
 # GWS Invoicing Platform (DRAFT)
 
 Please read the [draft (v0.1) specification document](specification.md).

@@ -44,22 +44,69 @@ Status: `Settled`
 
 ## 3. Scope and non goals
 
-Status: `Draft`
+Status: Settled
 
 In scope for the Core:
 
 - Customer, product and document data models.
 - Draft creation and editing.
-- Issuing documents (invoices, credit notes) as immutable, numbered, chained ledger events.
+- Issuing documents (invoices, credit notes) as immutable, numbered, chained
+  ledger events.
 - The tamper evident financial ledger, anchoring and verification.
+- Signing and key handling.
 - The extension runtime, permission model and event broker.
+- Authentication as an OIDC relying party.
+- Two principal types: Instance Admin and Company, with separate session
+  management.
+- A CLI recovery path for IdP lockout.
+
+The data models are the canonical structures all extensions build on: field
+complete against EN 16931 (section 7), lean on behaviour, not on data. Drafts
+are fully mutable, not chained, not signed; mutability ends at issue
+(section 11.7). Issuance is a single serialised atomic transaction covering
+number allocation, snapshot, hash, sign and append (section 12). The ledger,
+anchoring and verification subsystems are specified in sections 11, 13
+and 14. Key handling covers the instance signing key for ledger events and
+verification of extension manifest signatures against pinned or GWS root keys
+(section 10.2). The extension runtime covers manifest validation, permission
+enforcement, sandboxing and the brokering of all events; extensions never
+hold a direct channel to one another (sections 8 to 10).
+
+On authentication, the Core never stores or verifies credentials. The default
+deployment bundles a lightweight, preconfigured IdP; bring your own IdP is a
+configuration change. Machine to machine auth (extensions, API clients) uses
+OAuth client credentials against the same IdP. Instance Admin covers service
+administration, Company covers day to day operation; client access, where
+offered, is scoped under a Company. IdP lockout recovery is local CLI only:
+the platform owner can extract data or re link the Core to a new IdP and
+re map accounts. It is never a remote action.
 
 Explicit non goals for the Core:
 
-- Tax calculation logic (extension territory).
-- Country specific e-invoicing format generation (extension territory).
-- Presentation customisation by third parties (banners, promotions and similar are not a Core concern and must not leak into it).
-- Bank connectivity and reconciliation (proprietary feature extension territory).
+- A user interface.
+- Identity provision.
+- Tax calculation logic.
+- Country specific e-invoicing format generation.
+- Double entry bookkeeping.
+- Payroll.
+- Presentation customisation by third parties.
+- Bank connectivity and reconciliation.
+
+The Core is headless: all UI is extension territory, including the first
+party one, which consumes the same contract as any other extension.
+Credential storage, login flows and MFA belong to the IdP. Tax logic and
+e-invoicing format generation are extension territory (sections 15 and 7),
+though the Core data model must be field complete enough to feed any required
+format. Double entry bookkeeping is core extension territory: a projector
+folding ledger events into a chart of accounts, inheriting the ledger's
+tamper evidence; the Core's obligation is only that events carry enough
+detail to derive postings. Payroll is a possible future core extension, not a
+commitment. Presentation customisation by third parties (banners, promotions
+and similar) must not leak into the Core. Bank connectivity and
+reconciliation are proprietary feature extension territory.
+
+Platform ambition: the long term trajectory is full accounting capability
+delivered through extensions. The Core remains invoicing scoped.
 
 ## 4. System overview
 

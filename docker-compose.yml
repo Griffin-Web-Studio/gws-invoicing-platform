@@ -33,10 +33,6 @@ services:
       - core
     ports:
       - "3030:3000"
-    volumes:
-      - ./packages/web-user-interface:/app:Z
-      - /app/node_modules
-    userns_mode: "keep-id"
 
 volumes:
   postgres_data:

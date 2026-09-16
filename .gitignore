@@ -19,3 +19,12 @@ venv.bak/
 #   you could uncomment the following to ignore the entire vscode folder
 .vscode/settings.json
 !.vscode/launch.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directory
+node_modules
+.pnpm-store

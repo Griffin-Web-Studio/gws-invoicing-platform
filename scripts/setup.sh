@@ -17,6 +17,9 @@ uv sync --all-extras
 # Activate virtual python environment
 source .venv/bin/activate
 
+# devcontainer's python doesn't ship pip in the venv by default
+python -m ensurepip --upgrade
+
 # ────────────────────────────────────────────────────────| Pre-commit hooks |──
 
 if ! command -v pre-commit &>/dev/null; then

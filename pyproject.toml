@@ -4,12 +4,29 @@ version = "0.2.1"
 description = "Meta repository for GWS invoicing platform"
 readme = "README.md"
 requires-python = ">=3.14"
+dependencies = [
+  "factory-boy>=3.3.3",
+  "Django>=6.0.3",
+  "whitenoise>=6.9.0",
+  "django-environ>=0.13",
+  "mozilla-django-oidc>=4.0",
+  "gunicorn>=23.0.0",
+  "jinja2>=3.1",
+  "weasyprint>=69.0",
+  "psycopg2-binary>=2.9.13",
+]
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
+  "pytest-django",
+  "pytest-cov",
   "black>=26.3.0",
-  "commitizen>=4.16.3",
+  "django-browser-reload>=1.21.0",
+  "django-watchfiles>=1.4.0",
   "pre-commit>=4.5.1",
+  "commitizen>=4.16.3",
+  "Pillow>=11.0.0",
+  "CairoSVG>=2.7.1",
 ]
 
 [tool.commitizen]
@@ -41,3 +58,5 @@ exclude = '''
   | .git
 )/
 '''
+
+pre_bump_hooks = ["uv lock", "git add uv.lock"]

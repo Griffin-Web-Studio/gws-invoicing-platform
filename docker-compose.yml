@@ -12,7 +12,7 @@ services:
 
   core:
     build:
-      context: ./core
+      context: ./packages/core
     environment:
       DEBUG: ${CORE_DEBUG:-1}
       POSTGRES_HOST: postgres
@@ -25,17 +25,17 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./core:/app
+      - ./packages/core:/app
 
   web-user-interface:
     build:
-      context: ./web-user-interface
+      context: ./packages/web-user-interface
     depends_on:
       - core
     ports:
       - "3000:3000"
     volumes:
-      - ./web-user-interface:/app
+      - ./packages/web-user-interface:/app
       - /app/node_modules
 
 volumes:

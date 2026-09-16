@@ -4,3 +4,6 @@
 [submodule "web-user-interface"]
 	path = packages/web-user-interface
 	url = https://gitlab.com/griffin-web-studio/garage/books/web-user-interface.git
+[submodule "proto"]
+	path = packages/proto
+	url = https://gitlab.com/griffin-web-studio/garage/books/proto.git

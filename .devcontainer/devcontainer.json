@@ -2,8 +2,14 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-in-docker
 {
 	"name": "Docker in Docker",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/base:bookworm",
+	// Composes the root stack's postgres service with the devcontainer's own
+	// service, so postgres is available without needing to start `core`.
+	"dockerComposeFile": [
+		"docker-compose.yml"
+	],
+	"service": "devcontainer",
+	"workspaceFolder": "/workspaces/gws-invoicing-platform",
+	"shutdownAction": "stopCompose",
 
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {
@@ -79,11 +85,8 @@
   },
 
 
-	// Permit providing extra envvars to devcontainer
-  "runArgs": [
-    "--env-file",
-    ".devcontainer/.env"
-  ],
+  // Extra envvars are now supplied via .devcontainer/docker-compose.yml's
+  // env_file instead (runArgs isn't valid with dockerComposeFile).
   "remoteEnv": {
     "CLAUDE_CONFIG_DIR": "${containerWorkspaceFolder}/.claude-sessions"
   }

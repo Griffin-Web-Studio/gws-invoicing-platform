@@ -1,0 +1,43 @@
+[project]
+name = "gws-invoicing-platform"
+version = "0.2.1"
+description = "Meta repository for GWS invoicing platform"
+readme = "README.md"
+requires-python = ">=3.14"
+
+[dependency-groups]
+dev = [
+  "black>=26.3.0",
+  "commitizen>=4.16.3",
+  "pre-commit>=4.5.1",
+]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.0.0"
+version_scheme = "semver2"
+tag_format = "v$version"
+update_changelog_on_bump = true
+changelog_incremental = true
+changelog_merge_prerelease = true
+version_files = [
+  "pyproject.toml:^version",
+  "README.md:^# Local Git Sentinel",
+  "README.md:releases/v",
+]
+
+[tool.commitizen.change_type_map]
+feat = "Features"
+fix = "Bug Fixes"
+perf = "Performance Improvements"
+refactor = "Refactoring"
+
+[tool.black]
+line-length = 80
+exclude = '''
+/(
+    migrations
+  | venv
+  | .git
+)/
+'''

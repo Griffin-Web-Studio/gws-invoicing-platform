@@ -1,6 +1,1 @@
 .env
-
-# core and web-user-interface are independent repos checked out here for
-# local docker-compose convenience; this repo does not track their contents.
-/core/
-/web-user-interface/

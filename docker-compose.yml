@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gws_books}
+      POSTGRES_USER: ${POSTGRES_USER:-gws_books}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gws_books}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  core:
+    build:
+      context: ./core
+    environment:
+      DEBUG: ${CORE_DEBUG:-1}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-gws_books}
+      POSTGRES_USER: ${POSTGRES_USER:-gws_books}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gws_books}
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./core:/app
+
+  web-user-interface:
+    build:
+      context: ./web-user-interface
+    depends_on:
+      - core
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./web-user-interface:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:

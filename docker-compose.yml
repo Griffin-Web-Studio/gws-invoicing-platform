@@ -23,7 +23,8 @@ services:
     ports:
       - "8080:8000"
     volumes:
-      - ./packages/core:/app
+      - ./packages/core:/app:Z
+    userns_mode: "keep-id"
 
   web-user-interface:
     build:
@@ -33,8 +34,9 @@ services:
     ports:
       - "3030:3000"
     volumes:
-      - ./packages/web-user-interface:/app
+      - ./packages/web-user-interface:/app:Z
       - /app/node_modules
+    userns_mode: "keep-id"
 
 volumes:
   postgres_data:

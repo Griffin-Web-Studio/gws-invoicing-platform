@@ -35,7 +35,7 @@ services:
       - "3030:3000"
     volumes:
       - ./packages/web-user-interface:/app:Z
-      - /app/node_modules:U
+      - /app/node_modules
     userns_mode: "keep-id"
 
 volumes:

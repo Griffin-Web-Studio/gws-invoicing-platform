@@ -28,3 +28,7 @@ npm-debug.log*
 # Dependency directory
 node_modules
 .pnpm-store
+
+# Packages without a remote yet (plain nested git repos for now, same as
+# core/web-user-interface before they became submodules)
+/packages/proto/

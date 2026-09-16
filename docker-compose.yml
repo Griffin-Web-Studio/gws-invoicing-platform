@@ -7,8 +7,6 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gws_books}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
 
   core:
     build:
@@ -23,7 +21,7 @@ services:
     depends_on:
       - postgres
     ports:
-      - "8000:8000"
+      - "8080:8000"
     volumes:
       - ./packages/core:/app
 
@@ -33,7 +31,7 @@ services:
     depends_on:
       - core
     ports:
-      - "3000:3000"
+      - "3030:3000"
     volumes:
       - ./packages/web-user-interface:/app
       - /app/node_modules

@@ -39,8 +39,6 @@ changelog_incremental = true
 changelog_merge_prerelease = true
 version_files = [
   "pyproject.toml:^version",
-  "README.md:^# Local Git Sentinel",
-  "README.md:releases/v",
 ]
 
 [tool.commitizen.change_type_map]

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# git-sentinel setup.sh - prepares the local dev environment. Run once after
+# setup.sh - prepares the GWS Books local dev environment. Run once after
 # cloning, from the project root directory.
 set -euo pipefail
 

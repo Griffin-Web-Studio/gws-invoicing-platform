@@ -1,0 +1,6 @@
+[submodule "core"]
+	path = core
+	url = https://gitlab.com/griffin-web-studio/garage/books/core.git
+[submodule "web-user-interface"]
+	path = web-user-interface
+	url = https://gitlab.com/griffin-web-studio/garage/books/web-user-interface.git

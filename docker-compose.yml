@@ -7,24 +7,24 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gws_books}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gws_books}"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
 
   core:
     build:
       context: ./packages/core
     environment:
-      DEBUG: ${CORE_DEBUG:-1}
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
       POSTGRES_DB: ${POSTGRES_DB:-gws_books}
       POSTGRES_USER: ${POSTGRES_USER:-gws_books}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-gws_books}
     depends_on:
-      - postgres
-    ports:
-      - "8080:8000"
-    volumes:
-      - ./packages/core:/app:Z
-    userns_mode: "keep-id"
+      postgres:
+        condition: service_healthy
 
   web-user-interface:
     build:

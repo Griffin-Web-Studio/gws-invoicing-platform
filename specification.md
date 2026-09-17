@@ -112,12 +112,13 @@ delivered through extensions. The Core remains invoicing scoped.
 
 Status: `Settled`
 
-The platform is a Core plus a set of extensions. Extensions come in two types:
+The platform is a Core plus a set of extensions. Extensions come in three types:
 
 - Core extensions: owned by GWS, maintained kernel style with merge requests from their maintainers, signed by a GWS root key, loaded into the Core's trust zone. They have a kill switch (see section 8).
+- Essential extensions: a narrow case of the below, sandboxed like any Feature extension but GWS signed and allowlisted, so the Core auto accepts them without interactive consent. Essential affects consent only, never trust (see section 8.4).
 - Feature extensions: built by anyone, signed by their own author, sandboxed, never inside the Core's trust zone.
 
-An extension's type is derived from who signed it and where it loads from, not from any self declared field. A feature extension cannot become a Core extension by claiming to be one.
+An extension's type is derived from who signed it, whether it is allowlisted, and where it loads from, not from any self declared field. A feature extension cannot become a Core or Essential extension by claiming to be one.
 
 Extensions may run inside the deployment's Docker Compose (local) or be hosted by a third party (for proprietary code, for example bank statement reconciliation).
 
@@ -172,7 +173,7 @@ Status: `Settled`
 - Signed by a GWS root key, ideally held offline or on hardware.
 - Loaded into the Core's trust zone.
 - Kept lean. The spec discourages Core extension development by default and rejects feature extensions that try to enter the Core under the guise of being core.
-- Carry a kill switch: the Core checks a GWS signed revocation list and can disable a Core extension if a vulnerability is found. The revocation list must also work offline for air gapped deployments, so it is bundled in updates with an optional online check.
+- Carry a kill switch: the Core checks a GWS signed revocation list and can disable a Core extension if a vulnerability is found. The list revokes by extension identity and version, or version range, not by key: every Core extension shares the one GWS root key, so revoking a key would take down everything GWS has ever signed rather than the one bad release, and would defeat the point of pinning a stable key in the first place. A fixed version ships normally once it is off the list. The revocation list must also work offline for air gapped deployments, so it is bundled in updates with an optional online check.
 
 ### 8.2 Feature extensions
 
@@ -186,6 +187,14 @@ Extensions may be:
 
 - Local: a service in the deployment's Docker Compose.
 - Third party hosted: a remote service, typically for proprietary code such as bank reconciliation.
+
+### 8.4 Essential extensions
+
+Status: `Draft`
+
+A narrow third category alongside Core and Feature extensions: sandboxed exactly like a Feature extension, never in the trust zone, no in-process access, no relaxation of the runtime enforcement in section 10.3. Its manifest is signed by the GWS root key and listed on an allowlist the Core ships and updates with itself, the same bundled-with-updates mechanism as the Core extension revocation list (section 8.1), including the same kill switch, revoking by extension identity and version rather than by key for the same reason: the GWS root key is shared across every Core and Essential extension, so only version level revocation lets a fixed release resume working without also re-trusting a compromised one. The Core auto accepts an essential extension's manifest, skipping the interactive consent flow in section 10.
+
+Essential affects consent only, never trust. It exists to break the bootstrapping problem: something has to be running and trusted before a human can use any UI to grant permissions to anything else, and the first party web UI is the canonical case. This distinction matters most for exactly the extension most likely to be marked essential. The first party web UI is internet facing, and per section 2's assumption that the box is compromised, an internet facing web server must be assumed compromised eventually regardless of framework. Essential status must never become a backdoor around the sandbox for the platform's largest attack surface. A GWS signature alone does not confer essential status; both the signature and the allowlist entry are required, and the allowlist itself is part of what a GWS release attests to.
 
 ## 9. Core to extension communication
 
@@ -222,7 +231,15 @@ A static, signed document declaring at least:
 - Events published and subscribed (`publishes`, `subscribes`), namespaced.
 - Declared data residency (see section 16).
 
-The Core reads the manifest and presents the requested permissions to the user before linking. On acceptance, the Core establishes the secure connection.
+Serialised as canonical JSON (RFC 8785) before signing: the manifest is reviewed by a human through a UI, and JSON keeps that review, and the tooling around it, simple.
+
+An extension submits its signed manifest to the Core over gRPC as the first call after the handshake (section 9), before any other RPC is permitted on that connection. The Core itself never presents anything to a human or observes consent directly, it is headless (section 3). Instead:
+
+- An essential extension (section 8.4) is auto accepted against the allowlist.
+- A Core extension is accepted once its GWS signature verifies.
+- Any other extension is queued pending review. The Core exposes the pending manifest and the accept or reject decision as a small RPC surface, gated to the Instance Admin principal (section 3). An Instance Admin authenticated client, the local TUI or the web UI, calls that surface and renders it for a human to decide. The TUI is an ongoing admin tool, not a one time bootstrap step, matching the existing local CLI only precedent for IdP lockout recovery (section 3): some operator actions are deliberately local, never remote.
+
+On acceptance, the Core enables the connection for everything the manifest was granted. On rejection, the Core closes it.
 
 ### 10.2 Signing
 
@@ -443,13 +460,14 @@ To resolve: confirm the Core licence and the contribution and copyright assignme
 - Anchor: a periodic commitment of the chain's Merkle root to an external authority that the operator cannot rewrite.
 - Manifest: a signed, static declaration of an extension's identity, version, permissions and event topics.
 - Core extension: GWS owned, GWS signed, kernel style, in the Core trust zone.
+- Essential extension: GWS signed and allowlisted, auto accepted, sandboxed like a Feature extension, outside the trust zone. Skips consent, never trust.
 - Feature extension: third party, self signed, sandboxed, outside the trust zone.
 
 ## 20. Open questions
 
 - Product name.
 - Single living spec or a set of RFCs for the deep dives.
-- Payload serialisation: canonical JSON versus protobuf.
+- Ledger event payload serialisation: canonical JSON versus protobuf (section 11.5).
 - Full EN 16931 field mapping for the Core invoice model.
 - Tax primitive interface and rounding strategy hook.
 - Erasure propagation protocol and residency enforcement.
